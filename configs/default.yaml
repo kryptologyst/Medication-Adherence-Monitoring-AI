@@ -1,0 +1,92 @@
+# Configuration for Medication Adherence Monitoring
+
+# Data Configuration
+data:
+  synthetic:
+    n_patients: 1000
+    n_days_per_patient: 30
+    seed: 42
+  
+  features:
+    static:
+      - age
+      - gender
+      - comorbidities_count
+      - medication_complexity
+      - insurance_type
+    
+    temporal:
+      - dose_taken
+      - on_time
+      - missed_previous_day
+      - reported_side_effects
+      - mood_score
+      - stress_level
+
+# Model Configuration
+model:
+  name: "ensemble"  # Options: logistic_regression, xgboost, tabnet, ft_transformer, ensemble
+  ensemble:
+    models:
+      - xgboost
+      - tabnet
+      - ft_transformer
+    weights: [0.4, 0.3, 0.3]
+
+# Training Configuration
+training:
+  batch_size: 64
+  learning_rate: 0.001
+  epochs: 100
+  early_stopping_patience: 10
+  validation_split: 0.2
+  test_split: 0.2
+  
+# Evaluation Configuration
+evaluation:
+  metrics:
+    - auroc
+    - auprc
+    - sensitivity
+    - specificity
+    - ppv
+    - npv
+    - brier_score
+    - calibration_error
+  
+  fairness:
+    groups:
+      - age_group
+      - gender
+      - insurance_type
+  
+  calibration:
+    bins: 10
+    method: "isotonic"
+
+# Explainability Configuration
+explainability:
+  shap:
+    samples: 100
+    background_samples: 50
+  
+  uncertainty:
+    method: "mc_dropout"
+    n_samples: 100
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  log_dir: "logs"
+  tensorboard: true
+  
+# Device Configuration
+device:
+  auto: true  # Auto-detect: CUDA -> MPS -> CPU
+  fallback: true
+
+# Privacy Configuration
+privacy:
+  deid: true
+  redact_identifiers: true
+  log_phi: false
